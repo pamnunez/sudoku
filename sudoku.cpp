@@ -68,7 +68,8 @@ Sudoku::Sudoku() {
 void Sudoku::paintEvent(QPaintEvent*) {
 	QPainter p(this);
 	QPen pen(Qt::black);
-	
+	QFont font = QFont();
+	p.setFont(font);
 	// Draw border
 	p.drawRect(0,0,WIDTH-1, HEIGHT-1);
 
@@ -91,9 +92,14 @@ void Sudoku::paintEvent(QPaintEvent*) {
 			QString qstr = QString::number(board[i][j]);
 			QRectF qrect = QRectF(i*WIDTH/9,j*WIDTH/9,WIDTH/9,WIDTH/9);
 			p.drawRect(qrect);
+			if (init[i][j]) {
+				font.setWeight(99);
+				font.setPointSize(14);
+				p.drawText(qrect, Qt::AlignCenter, qstr);
+			}
 			if (board[i][j]) {
-				QTextCharFormat format;
-				format.setFontWeight(QFont::Bold);
+				font.setWeight(50);
+				font.setPointSize(14);
 				p.drawText(qrect, Qt::AlignCenter, qstr);
 			}
 		}
