@@ -70,8 +70,15 @@ void Sudoku::paintEvent(QPaintEvent*) {
 	QPen pen(Qt::black);
 	QFont font = QFont();
 	p.setFont(font);
+
 	// Draw border
 	p.drawRect(0,0,WIDTH-1, HEIGHT-1);
+	pen.setWidth(3);
+	p.setPen(pen);
+	p.drawLine(0,WIDTH/3,WIDTH,WIDTH/3);
+	p.drawLine(0,2*WIDTH/3,WIDTH,2*WIDTH/3);
+	p.drawLine(WIDTH/3,0,WIDTH/3,WIDTH);
+	p.drawLine(2*WIDTH/3,0,2*WIDTH/3,WIDTH);
 
 	// Iterate through each square
 	for (int i=0;i<9;i++){
@@ -86,20 +93,23 @@ void Sudoku::paintEvent(QPaintEvent*) {
 				pen.setWidth(1);
 				pen.setColor(Qt::black);
 			}
+			p.setPen(pen);
+
 
 			// Draw square and number inside
-			p.setPen(pen);
 			QString qstr = QString::number(board[i][j]);
 			QRectF qrect = QRectF(i*WIDTH/9,j*WIDTH/9,WIDTH/9,WIDTH/9);
 			p.drawRect(qrect);
 			if (init[i][j]) {
 				font.setWeight(99);
 				font.setPointSize(14);
+				p.setFont(font);
 				p.drawText(qrect, Qt::AlignCenter, qstr);
 			}
 			if (board[i][j]) {
 				font.setWeight(50);
 				font.setPointSize(14);
+				p.setFont(font);
 				p.drawText(qrect, Qt::AlignCenter, qstr);
 			}
 		}
