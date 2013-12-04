@@ -196,6 +196,11 @@ void Sudoku::keyPressEvent(QKeyEvent* event) {
 			board[select_x][select_y] = 9;
 		}
 	}
+	if (event->key() == Qt::Key_0) {
+		if ((init[select_x][select_y] == 0)&&(board[select_x][select_y] != 0)) {
+			board[select_x][select_y] = 0;
+		}
+	}
 	update();
 
 }
