@@ -8,18 +8,19 @@
 #include <QtGui>
 
 
-
 class Sudoku : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		Sudoku();
+		Sudoku(QWidget* parent);
 
 	private:
 		QTimer* timer;
 		static const int WIDTH = 450;
 		static const int HEIGHT = 450;
+		static const int MAIN_WIDTH = 450;
+		static const int MAIN_HEIGHT = 500;
 		int select_x;
 		int select_y;
 
@@ -31,36 +32,31 @@ class Sudoku : public QWidget
 		int board[9][9];
 	private slots:
 		void timerTicked();
+	public slots:
+		void reset();
+		void undo();
+		void check();
 	protected:
 		void paintEvent(QPaintEvent* event);
 		void keyPressEvent(QKeyEvent* event);
 		void keyReleaseEvent(QKeyEvent* event);
 
-/*	public slots:
-		void buttonPress();
 
-	protected:
-		void paintEvent(QPAINTEVENT* event);
-		void keyPressEvent(QKeyEvent* event);
-		void keyReleaseEvent(QKeyEvent* event);
-		void insert(int i, int j, unsigned int num);
+};
 
-	private slots:
-		void timerTicked();
+class MainWindow : public QWidget {
+
+	Q_OBJECT
+
+	public:
+		MainWindow();
 
 	private:
-		void reset();
-
-	enum { PLAYING, AFTER_PLAY } state;
-
-	QTimer* timer;
-
-	int selected_square;
-	static const int num_rows = 9;
-	static const int num_cols = 9;
-
-	bool win;
-*/	
+		Sudoku* sudoku;
+		QPushButton* new_game;
+		QPushButton* check_game;
+		QPushButton* undo_move;
 };
+
 
 #endif

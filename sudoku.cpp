@@ -6,13 +6,30 @@
 #include <QtGui>
 #include "sudoku.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
-
-Sudoku::Sudoku() {
-
+MainWindow::MainWindow() {
+	
 	setWindowTitle("Qt Sudoku");
-	QGridLayout* layout = new QGridLayout(this);
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	sudoku = new Sudoku(this);
+	layout->addWidget(sudoku);
+
+	new_game = new QPushButton("New Game",this);
+	check_game  = new QPushButton("Check",this);
+	undo_move = new QPushButton("Undo Last Move",this);
+	QHBoxLayout* buttons = new QHBoxLayout(this);
+	buttons->addWidget(new_game);
+	buttons->addWidget(undo_move);
+	buttons->addWidget(check_game);
+	layout->addLayout(buttons);
+	
+}
+
+Sudoku::Sudoku(QWidget* parent)
+ : QWidget(parent) {
+
 
 	/* Init timer */
 	timer = new QTimer(this);
@@ -24,16 +41,44 @@ Sudoku::Sudoku() {
 	selectLeft = false;
 	selectRight = false;
 	
-	int initial[9][9] = { {4,8,7,0,5,0,0,6,0},
-				{9,0,0,4,0,0,0,0,3},
-				{2,0,6,0,8,9,5,0,0},
-				{0,0,4,0,1,5,6,0,0},
-				{1,0,0,0,0,4,0,5,0},
-				{0,7,8,2,0,0,0,0,0},
-				{0,0,0,0,0,8,0,7,0},
-				{7,5,0,0,0,0,0,3,0},
-				{0,2,0,0,3,7,4,1,0} };
+	int initial[9][9];// = { {4,8,7,0,5,0,0,6,0},
+//				{9,0,0,4,0,0,0,0,3},
+//				{2,0,6,0,8,9,5,0,0},
+//				{0,0,4,0,1,5,6,0,0},
+//				{1,0,0,0,0,4,0,5,0},
+//				{0,7,8,2,0,0,0,0,0},
+//				{0,0,0,0,0,8,0,7,0},
+//				{7,5,0,0,0,0,0,3,0},
+//				{0,2,0,0,3,7,4,1,0} };
 
+
+	ifstream gameData;
+	int temp;
+	gameData.open ("games.txt");
+	if (gameData.is_open() == true) { cout << "File opened." << endl; }
+	temp = gameData.get();
+	cout << "First char in file: " << temp << endl;
+	if (gameData.is_open()) {
+		while(temp != '\n') {
+			for (int x = 0; x < 9; x++) {
+				for (int y = 0; y < 9; y++) {
+					initial[y][x] = temp - '0';
+					temp = gameData.get();
+				}
+			}
+		}
+	}
+	gameData.close();
+	for (int x = 0; x < 9; x++) {
+		for (int y = 0; y < 9; y++) {
+			cout << "initial[" << x << "][" << y << "] = " << initial[x][y] << endl;
+		}
+	}
+//
+//
+//
+//
+//
 	for (int i = 0; i <= 8; i++) { 
 		for (int j = 0; j <= 8; j++) { 
 			init[i][j] = initial[i][j];
@@ -47,22 +92,39 @@ Sudoku::Sudoku() {
 
 	setFixedSize(WIDTH,HEIGHT);
 	
-// The coordinates of the selected square
+	// The coordinates of the selected square
 	select_y = 4;
 	select_x = 3;	
-
-// For initializing numbers on board... for now they are all 1's
-/*	for (int i=0;i<9;i++){
-		for (int j=0;j<9;j++){
-			QLabel *label = new QLabel(this);
-			QString qstr = QString::number(1);
-			label->setText(qstr);
-			layout->addWidget(label,i,j);
-		}
-	}*/
+	grabKeyboard();
 
 	timer->start(100);
 	update();
+}
+
+void Sudoku::reset(){
+
+}
+
+void Sudoku::undo(){
+
+}
+
+void Sudoku::check(){
+	for (int x = 0; x < 9; x++) {
+		for (int y = 0; y < 9; y++) {
+			if (board[select_x][select_y] != init[select_x][select_y]) {
+		QPainter p(this);
+	QPen pen(Qt::black);
+	QFont font = QFont();
+	p.setFont(font);			
+	pen.setWidth(3);
+	p.setPen(pen);
+
+			QString qstr = QString::number(board[i][j]);
+			}
+		}
+	}
+
 }
 
 void Sudoku::paintEvent(QPaintEvent*) {
@@ -79,6 +141,7 @@ void Sudoku::paintEvent(QPaintEvent*) {
 	p.drawLine(0,2*WIDTH/3,WIDTH,2*WIDTH/3);
 	p.drawLine(WIDTH/3,0,WIDTH/3,WIDTH);
 	p.drawLine(2*WIDTH/3,0,2*WIDTH/3,WIDTH);
+
 
 	// Iterate through each square
 	for (int i=0;i<9;i++){
@@ -196,11 +259,6 @@ void Sudoku::keyPressEvent(QKeyEvent* event) {
 			board[select_x][select_y] = 9;
 		}
 	}
-	if (event->key() == Qt::Key_0) {
-		if ((init[select_x][select_y] == 0)&&(board[select_x][select_y] != 0)) {
-			board[select_x][select_y] = 0;
-		}
-	}
 	update();
 
 }
@@ -214,24 +272,11 @@ void Sudoku::keyReleaseEvent(QKeyEvent*) {
 
 int main(int argc, char** argv)
 {
-  QApplication app(argc, argv);
+	QApplication app(argc, argv);
 
-  // Run game
-  Sudoku sudoku;
-  sudoku.show();
+	// Run game
+	MainWindow game;
+	game.show();
 
-
-
-
-  return app.exec();
+	return app.exec();
 }
-
-/*
-
-// Insert number at location i,j
-Sudoku::Insert(int i, int j, unsigned int num){
-
-	if ((i<9)&&(j<9)&&(num<10))
-		board[i][j] = num;
-
-}*/
